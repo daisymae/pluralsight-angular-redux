@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CourseService } from './course.service';
 import { Course } from './course';
 import { FilterTextComponent, FilterService } from '../blocks/filter-text';
+import { store } from '../store';
 
 @Component({
   selector: 'app-course-list',
@@ -20,15 +21,28 @@ export class CourseListComponent implements OnInit {
     this.filteredCourses = this._filterService.filter(searchText, ['id', 'name', 'topic'], this.courses);
   }
 
-  getCourses() {
-    this._courseService.getCourses()
-      .subscribe(courses => {
-        this.courses = this.filteredCourses = courses;
-      });
+  // this gets replaced with updateFromState
+  // getCourses() {
+  //   this._courseService.getCourses()
+  //     .subscribe(courses => {
+  //       this.courses = this.filteredCourses = courses;
+  //     });
+  // }
+
+  // deal with store
+  updateFromState() {
+    const allState = store.getState();
+    this.courses = allState.courses;
+    this.filteredCourses = allState.courses;
   }
 
   ngOnInit() {
-    this.getCourses();
+    // this.getCourses();
+    this.updateFromState();
+    // the following handles updates in the state by subscribing
+    store.subscribe(() => {
+      this.updateFromState();
+    });
     componentHandler.upgradeDom();
   }
 }
